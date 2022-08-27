@@ -13,6 +13,7 @@ export const serverSchema = z.object({
   AUTH0_CLIENT_ID: z.string(),
   AUTH0_CLIENT_SECRET: z.string(),
   AUTH0_ISSUER: z.string(),
+  REDIS_URL: z.string(),
 });
 
 /**
