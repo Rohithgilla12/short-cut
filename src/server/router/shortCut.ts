@@ -30,12 +30,12 @@ export const shortCutRouter = createRouter()
   })
   .query("getShortLink", {
     input: z.object({
-      slug: z.string(),
+      id: z.number(),
     }),
     async resolve({ input, ctx }) {
-      return await ctx.prisma.shortLink.findFirst({
+      return ctx.prisma.shortLink.findUnique({
         where: {
-          slug: input.slug,
+          id: input.id,
         },
       });
     },

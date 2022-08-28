@@ -16,7 +16,9 @@ const MyApp: AppType = ({
       {/* Not sure if this is the right place to put this
         Maybe need to do some hacks with the document.tsx file
        */}
-      <Component {...pageProps} />
+      <div data-theme="pastel">
+        <Component {...pageProps} />
+      </div>
     </SessionProvider>
   );
 };
