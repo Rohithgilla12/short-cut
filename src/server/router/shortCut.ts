@@ -19,7 +19,10 @@ export const shortCutRouter = createRouter()
       });
 
       // Save in Redis
-      await createShortLink(shortLink);
+      await createShortLink({
+        ...shortLink,
+        createdAt: new Date(shortLink.createdAt),
+      });
 
       return shortLink;
     },

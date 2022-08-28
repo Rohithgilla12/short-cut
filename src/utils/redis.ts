@@ -18,7 +18,7 @@ const schema = new Schema(
   {
     id: { type: "number" },
     url: { type: "string", indexed: true },
-    createdAt: { type: "string" },
+    createdAt: { type: "date" },
     slug: { type: "string" },
     uid: { type: "string" },
   },
@@ -32,7 +32,7 @@ export const createIndex = async () => {
   await repository.createIndex();
 };
 
-export const createShortLink = async (data: Omit<ShortLink, "createdAt">) => {
+export const createShortLink = async (data: ShortLink) => {
   await connect();
 
   const repository = redisClient.fetchRepository(schema);
