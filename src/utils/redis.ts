@@ -1,8 +1,9 @@
 import { Client, Entity, Schema } from "redis-om";
 
+import { ShortLink } from "@prisma/client";
 import { env } from "../env/server.mjs";
 
-const redisClient = new Client();
+export const redisClient = new Client();
 
 const connect = async () => {
   if (!redisClient.isOpen()) {
@@ -10,10 +11,10 @@ const connect = async () => {
   }
 };
 
-class ShortLink extends Entity {}
+class ShortLinkRedis extends Entity {}
 
 const schema = new Schema(
-  ShortLink,
+  ShortLinkRedis,
   {
     id: { type: "number" },
     url: { type: "string", indexed: true },
@@ -29,4 +30,11 @@ export const createIndex = async () => {
 
   const repository = redisClient.fetchRepository(schema);
   await repository.createIndex();
+};
+
+export const createShortLink = async (data: Omit<ShortLink, "createdAt">) => {
+  await connect();
+
+  const repository = redisClient.fetchRepository(schema);
+  return await repository.createAndSave(data);
 };

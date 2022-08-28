@@ -1,5 +1,6 @@
 import { signIn, useSession } from "next-auth/react";
 
+import { CreateShortCutForm } from "../components/createShortCutForm";
 import Head from "next/head";
 import type { NextPage } from "next";
 import { trpc } from "../utils/trpc";
@@ -7,7 +8,7 @@ import { trpc } from "../utils/trpc";
 const Home: NextPage = () => {
   const { status, data } = useSession();
 
-  const hello = trpc.useQuery(["example.hello", { text: "from tRPC" }]);
+  const hello = trpc.useQuery(["shortCut.getShortLink", { slug: "meme" }]);
 
   return (
     <>
@@ -19,7 +20,7 @@ const Home: NextPage = () => {
 
       <main className="container mx-auto flex flex-col items-center justify-center min-h-screen p-4">
         <div className="pt-6 text-2xl text-blue-500 flex justify-center items-center w-full">
-          {hello.data ? <p>{hello.data.greeting}</p> : <p>Loading..</p>}
+          {hello.data ? <p>{JSON.stringify(hello.data)}</p> : <p>Loading..</p>}
         </div>
 
         {status === "unauthenticated" ? (
@@ -27,6 +28,17 @@ const Home: NextPage = () => {
         ) : (
           <text>{JSON.stringify(data, null, 2)}</text>
         )}
+        <CreateShortCutForm />
+        <button
+          onClick={async () => {
+            const shortLink = hello.data!;
+
+            // await createShortLink(shortLink);
+            console.log(shortLink);
+          }}
+        >
+          Test REdis
+        </button>
       </main>
     </>
   );

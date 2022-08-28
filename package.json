@@ -16,6 +16,7 @@
     "@trpc/next": "^9.27.2",
     "@trpc/react": "^9.27.2",
     "@trpc/server": "^9.27.2",
+    "daisyui": "^2.24.0",
     "next": "12.2.5",
     "next-auth": "^4.10.3",
     "react": "18.2.0",
@@ -26,6 +27,8 @@
     "zod": "^3.18.0"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.2",
+    "@tailwindcss/typography": "^0.5.4",
     "@types/node": "18.0.0",
     "@types/react": "18.0.14",
     "@types/react-dom": "18.0.5",
