@@ -17,9 +17,9 @@ const schema = new Schema(
   ShortLinkRedis,
   {
     id: { type: "number" },
-    url: { type: "string", indexed: true },
+    url: { type: "string" },
     createdAt: { type: "date" },
-    slug: { type: "string" },
+    slug: { type: "string", indexed: true },
     uid: { type: "string" },
   },
   { dataStructure: "JSON" }
@@ -37,4 +37,13 @@ export const createShortLink = async (data: ShortLink) => {
 
   const repository = redisClient.fetchRepository(schema);
   return await repository.createAndSave(data);
+};
+
+export const getShortLink = async (slug: string) => {
+  await connect();
+
+  const repository = redisClient.fetchRepository(schema);
+  return <ShortLink | null | undefined>(
+    await repository.search().where("slug").equals(slug).return.first()
+  );
 };

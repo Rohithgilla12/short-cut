@@ -21,6 +21,7 @@ export const shortCutRouter = createRouter()
       // Save in Redis
       await createShortLink({
         ...shortLink,
+        // Working with dates is 🥲
         createdAt: new Date(shortLink.createdAt),
       });
 

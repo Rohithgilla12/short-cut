@@ -1,6 +1,6 @@
 import { signIn, useSession } from "next-auth/react";
 
-import { CreateShortCutForm } from "../components/createShortCutForm";
+import { CreateShortCutForm } from "../components/CreateShortCutForm";
 import Head from "next/head";
 import type { NextPage } from "next";
 import { trpc } from "../utils/trpc";
