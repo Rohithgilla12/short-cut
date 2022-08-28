@@ -47,6 +47,9 @@ export const shortCutRouter = createRouter()
   })
   .query("getAllShortLinksByUser", {
     async resolve({ ctx }) {
+      if (!ctx.session?.user?.id) {
+        return null;
+      }
       return await ctx.prisma.shortLink.findMany({
         where: {
           userId: ctx.session?.user?.id,

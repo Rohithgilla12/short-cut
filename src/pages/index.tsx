@@ -1,14 +1,22 @@
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
-import { CreateShortCutForm } from "../components/CreateShortCutForm";
 import Head from "next/head";
 import type { NextPage } from "next";
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { trpc } from "../utils/trpc";
+
+const CreateShortCutForm = dynamic(
+  () => import("../components/CreateShortCutForm"),
+  {
+    ssr: false,
+  }
+);
 
 const Home: NextPage = () => {
   const { status, data } = useSession();
 
-  const hello = trpc.useQuery(["shortCut.getShortLink", { slug: "meme" }]);
+  const userLinks = trpc.useQuery(["shortCut.getAllShortLinksByUser"]);
 
   return (
     <>
@@ -17,29 +25,28 @@ const Home: NextPage = () => {
         <meta name="description" content="Short Cut | Fastest URL Shortner" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <main className="container mx-auto flex flex-col items-center justify-center min-h-screen p-4">
-        <div className="pt-6 text-2xl text-blue-500 flex justify-center items-center w-full">
-          {hello.data ? <p>{JSON.stringify(hello.data)}</p> : <p>Loading..</p>}
+      <Suspense>
+        <div className="navbar bg-base-100">
+          <div className="flex-1">
+            <a className="btn btn-ghost normal-case text-xl">Short Cut</a>
+          </div>
+          <div className="flex-none gap-2">
+            {status === "unauthenticated" ? (
+              <button className="btn btn-primary" onClick={() => signIn()}>
+                Sign in
+              </button>
+            ) : (
+              <button className="btn btn-primary" onClick={() => signOut()}>
+                Sign out
+              </button>
+            )}
+          </div>
         </div>
-
-        {status === "unauthenticated" ? (
-          <button onClick={() => signIn()}>Sign in</button>
-        ) : (
-          <text>{JSON.stringify(data, null, 2)}</text>
-        )}
-        <CreateShortCutForm />
-        <button
-          onClick={async () => {
-            const shortLink = hello.data!;
-
-            // await createShortLink(shortLink);
-            console.log(shortLink);
-          }}
-        >
-          Test REdis
-        </button>
-      </main>
+        <main className="container mx-auto flex flex-col items-center justify-center min-h-screen p-4">
+          <CreateShortCutForm />
+          {JSON.stringify(userLinks.data)}
+        </main>
+      </Suspense>
     </>
   );
 };
