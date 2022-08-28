@@ -5,7 +5,6 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { ChartProvider, LineSeries, Tooltip, XAxis, YAxis } from "rough-charts";
 import { trpc } from "../../utils/trpc";
-import { nullable } from "zod";
 
 interface DateClicks {
   date: string;

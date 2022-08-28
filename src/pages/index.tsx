@@ -1,6 +1,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 
 import Head from "next/head";
+import Link from "next/link";
 import type { NextPage } from "next";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
@@ -44,6 +45,41 @@ const Home: NextPage = () => {
         </div>
         <main className="container mx-auto flex flex-col items-center justify-center min-h-screen p-4">
           <CreateShortCutForm />
+          <div className="overflow-x-auto">
+            <table className="table table-zebra w-full">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>URL</th>
+                  <th>Slug</th>
+                  <th>Analytics</th>
+                </tr>
+              </thead>
+              <tbody>
+                {userLinks.isLoading ? (
+                  <div>Loading...</div>
+                ) : (
+                  userLinks.data?.map((link) => (
+                    <tr key={link.id}>
+                      <th>{link.id}</th>
+                      <td>
+                        <a className="link" href={link.url}>
+                          {link.url}
+                        </a>
+                      </td>
+                      <td>{link.slug}</td>
+                      <td>
+                        <Link href={`/analytics/${link.id}`}>
+                          <span className="link">Analytics</span>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
           {JSON.stringify(userLinks.data)}
         </main>
       </Suspense>
