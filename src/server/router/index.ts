@@ -1,3 +1,4 @@
+import { analyticsRouter } from "./analytics";
 // src/server/router/index.ts
 import { createRouter } from "./context";
 import { exampleRouter } from "./example";
@@ -9,6 +10,7 @@ export const appRouter = createRouter()
   .transformer(superjson)
   .merge("example.", exampleRouter)
   .merge("shortCut.", shortCutRouter)
+  .merge("analytics", analyticsRouter)
   .merge("auth.", protectedExampleRouter);
 
 // export type definition of API
