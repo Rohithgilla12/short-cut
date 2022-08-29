@@ -1,28 +1,15 @@
-import { useEffect, useState } from "react";
-
-import { Analytics } from "@prisma/client";
-import { NextPage } from "next";
-import { useRouter } from "next/router";
 import { ChartProvider, LineSeries, Tooltip, XAxis, YAxis } from "rough-charts";
+
+import { NextPage } from "next";
 import { trpc } from "../../utils/trpc";
-
-interface DateClicks {
-  date: string;
-  clicks: number;
-}
-
-type AssetMapData = {
-  [key: string]: Analytics[];
-};
+import { useRouter } from "next/router";
 
 const Analytics: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const [dateClicksData, setDateClicksData] = useState<DateClicks[]>([]);
-
   const urlAnalytics = trpc.useQuery([
-    "analyticsgetLinkAnalytics",
+    "analyticsgetGraphData",
     { id: parseInt(id as string) },
   ]);
 
@@ -30,28 +17,6 @@ const Analytics: NextPage = () => {
     "shortCut.getShortLink",
     { id: parseInt(id as string) },
   ]);
-
-  useEffect(() => {
-    if (urlAnalytics.data) {
-      const assetMapData: AssetMapData = {};
-      urlAnalytics.data.forEach((data) => {
-        const date = new Date(data.createdAt);
-        const dateString = date.toDateString();
-
-        if (assetMapData[dateString] === undefined) {
-          assetMapData[dateString] = [data];
-        } else {
-          assetMapData[dateString]?.push(data);
-        }
-      });
-      const dateChartData: DateClicks[] = [];
-      Object.keys(assetMapData).forEach((key) => {
-        dateChartData.push({ date: key, clicks: assetMapData[key].length });
-      });
-
-      setDateClicksData(dateChartData);
-    }
-  }, [urlAnalytics.data]);
 
   //Future Scope: Check if the user is authenticated and if the user is the owner of the short link
 
@@ -65,13 +30,16 @@ const Analytics: NextPage = () => {
           <h3 className="text-xl">Slug: {shortLink.data.slug}</h3>
         </div>
       )}
-      {dateClicksData && (
+      {urlAnalytics.data && (
         <div className="stats shadow">
           <div className="stat">
             <div className="stat-title">Total Page Views</div>
             {/* Count all clicks in dataClicksData*/}
             <div className="stat-value">
-              {dateClicksData.reduce((a, b) => a + b.clicks, 0)}
+              {urlAnalytics.data.dateChartData.reduce(
+                (a, b) => a + b.clicks,
+                0
+              )}
             </div>
           </div>
         </div>
@@ -79,15 +47,29 @@ const Analytics: NextPage = () => {
 
       <div className="m-4 flex flex-col">
         <div className="my-4 w-screen">
-          <ChartProvider data={dateClicksData} height={300}>
-            <XAxis dataKey="date" />
-            <LineSeries dataKey="clicks" />
-            {/* <BarSeries dataKey="clicks" /> */}
-            <YAxis dataKey="clicks" format={(count) => `${count}`} />
-            <Tooltip>
-              {({ date, clicks }) => `Views on ${date}: ${clicks}`}
-            </Tooltip>
-          </ChartProvider>
+          {urlAnalytics.data && (
+            <ChartProvider data={urlAnalytics.data.dateChartData} height={300}>
+              <XAxis dataKey="date" />
+              <LineSeries dataKey="clicks" />
+              {/* <BarSeries dataKey="clicks" /> */}
+              <YAxis dataKey="clicks" format={(count) => `${count}`} />
+              <Tooltip>
+                {({ date, clicks }) => `Views on ${date}: ${clicks}`}
+              </Tooltip>
+            </ChartProvider>
+          )}
+        </div>
+      </div>
+      <div className="card  bg-bg-primary w-full text-neutral-content">
+        <div className="card-body items-center">
+          <h2 className="card-title">Future Scope</h2>
+          <ul>
+            <li>
+              Time analysis, know when your users are most actively visting the
+              link
+            </li>
+            <li>Export data into your favorite type</li>
+          </ul>
         </div>
       </div>
     </div>

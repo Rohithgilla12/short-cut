@@ -1,6 +1,16 @@
+import { Analytics } from "@prisma/client";
 import { createRouter } from "./context";
 import { getShortLink } from "./../../utils/redis";
 import { z } from "zod";
+
+interface DateClicks {
+  date: string;
+  clicks: number;
+}
+
+type AssetMapData = {
+  [key: string]: Analytics[];
+};
 
 export const analyticsRouter = createRouter()
   .mutation("createAnalytics", {
@@ -31,5 +41,38 @@ export const analyticsRouter = createRouter()
           shortLinkId: input.id,
         },
       });
+    },
+  })
+  .query("getGraphData", {
+    input: z.object({
+      id: z.number(),
+    }),
+    async resolve({ input, ctx }) {
+      const analytics = await ctx.prisma.analytics.findMany({
+        where: {
+          shortLinkId: input.id,
+        },
+      });
+      const assetMapData: AssetMapData = {};
+      analytics.forEach((data) => {
+        const date = new Date(data.createdAt);
+        const dateString = date.toDateString();
+        if (assetMapData[dateString] === undefined) {
+          assetMapData[dateString] = [data];
+        } else {
+          assetMapData[dateString]?.push(data);
+        }
+      });
+      const dateChartData: DateClicks[] = [];
+      Object.keys(assetMapData).forEach((key) => {
+        dateChartData.push({
+          date: key,
+          clicks: assetMapData[key]?.length ?? 0,
+        });
+      });
+
+      return {
+        dateChartData,
+      };
     },
   });
