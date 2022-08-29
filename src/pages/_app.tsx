@@ -1,10 +1,11 @@
-// src/pages/_app.tsx
-import { withTRPC } from "@trpc/next";
+import "../styles/globals.css";
+
 import type { AppRouter } from "../server/router";
 import type { AppType } from "next/dist/shared/lib/utils";
-import superjson from "superjson";
 import { SessionProvider } from "next-auth/react";
-import "../styles/globals.css";
+import superjson from "superjson";
+// src/pages/_app.tsx
+import { withTRPC } from "@trpc/next";
 
 const MyApp: AppType = ({
   Component,
@@ -12,7 +13,12 @@ const MyApp: AppType = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
+      {/* Not sure if this is the right place to put this
+        Maybe need to do some hacks with the document.tsx file
+       */}
+      <div data-theme="pastel">
+        <Component {...pageProps} />
+      </div>
     </SessionProvider>
   );
 };
